@@ -192,7 +192,7 @@ public class StatsRecorder {
         if (evolvingMorphology) {
             log.info("New best genome! Epoch: " + epoch + ", task performance:: " + genome.getScore()
                     + ", sensor complexity: " + score2);
-            txt = String.format("epoch: %d, fitness: %f, sensors: %f, neural: %f", epoch, genome.getScore(), score2, score3);
+            txt = String.format("epoch: %d, fitness: %f, sensors: %f, neural: %f", epoch, normaliseTaskScore(genome.getScore()), normaliseComplexityScore(score2), normaliseComplexityScore(score3));
 
         } else {
             log.info("New best genome! Epoch: " + epoch + ", task performance: "  + genome.getScore()+",morph complexity:"+score2+",neural complexity:"+score3);
@@ -299,6 +299,15 @@ public class StatsRecorder {
         } catch (IOException e) {
             log.error("Failed to append to log file", e);
         }
+
+
+    }
+
+    private Double normaliseComplexityScore(Double Score){
+        return Score/100;
+    }
+    private Double normaliseTaskScore(Double Score){
+        return Score/110;
     }
 
 }

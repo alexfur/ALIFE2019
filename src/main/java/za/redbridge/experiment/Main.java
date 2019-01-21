@@ -190,8 +190,8 @@ public class Main
     {
         @Parameter(names = "-c", description = "Simulation config file to load")
         //public static String configFile = "config/bossConfig.yml";
-      // public static String configFile = "config/ConfigSimple.yml";
-        public static String configFile = "config/ConfigMedium.yml";
+        public static String configFile = "config/ConfigSimple.yml";
+        //public static String configFile = "config/ConfigMedium.yml";
         // public static String configFile = "config/ConfigDifficult.yml";
 
         @Parameter(names = "-g", description = "Number of generations to train for")    // Jamie calls this 'iterations'
@@ -231,7 +231,7 @@ public class Main
 
         @Parameter(names = "--multi-objective", description = "Using Multi-Objective NEAT/HyperNEAT"
                 +" Based on NEAT-MODS")
-        public static boolean multiObjective = false;
+        public static boolean multiObjective = true;
 
         @Override
         public String toString()
