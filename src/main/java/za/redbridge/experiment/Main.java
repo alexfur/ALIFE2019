@@ -15,8 +15,10 @@ import za.redbridge.experiment.MultiObjective.MultiObjectiveEA;
 import za.redbridge.experiment.MultiObjective.MultiObjectiveHyperNEATUtil;
 import za.redbridge.experiment.MultiObjective.MultiObjectiveNEATMUtil;
 import za.redbridge.experiment.NEAT.NEATPopulation;
+import za.redbridge.experiment.NEAT.NEATUtil;
 import za.redbridge.experiment.NEATM.NEATMPopulation;
 import za.redbridge.experiment.NEATM.NEATMUtil;
+import za.redbridge.experiment.NEATM.sensor.SensorMorphology;
 import za.redbridge.experiment.SingleObjective.SingleObjectiveEA;
 import za.redbridge.simulator.config.SimConfig;
 
@@ -58,8 +60,15 @@ public class Main
             simConfig = new SimConfig();
         }
 
+        SensorMorphology morphology = null;
+        if(! options.evolvingMorphology)
+        {
+            morphology = new KheperaIIIMorphology();
+        }
+
         ScoreCalculator calculateScore =
-                new ScoreCalculator(simConfig, options.trialsPerIndividual, null, options.hyperNEATM);
+                new ScoreCalculator(simConfig, options.trialsPerIndividual, morphology, options.hyperNEATM);
+
 
         String type = "";
         if (!isBlank(options.genomePath))
@@ -105,6 +114,7 @@ public class Main
             }
             else
             {
+                //@todo add in HyperNEATUtil
                 train = HyperNEATMUtil.constructNEATTrainer(population, calculateScore);
                 ((SingleObjectiveEA) train).setCODEC(new HyperNEATMCODEC());
             }
@@ -118,7 +128,13 @@ public class Main
             }
             else
             {
-                train = NEATMUtil.constructNEATTrainer(population, calculateScore);
+                if(options.evolvingMorphology){
+                    train = NEATMUtil.constructNEATTrainer(population, calculateScore);
+                }
+                else{
+                    train = NEATUtil.constructNEATTrainer(population, calculateScore);
+                }
+
             }
         }
         //prevent elitist selection --> in future should use this for param tuning
@@ -198,11 +214,11 @@ public class Main
         public static int numGenerations = 250;
 
         @Parameter(names = "-p", description = "Initial population size")
-        public static int populationSize = 150;
+        public static int populationSize = 50;
 
         @Parameter(names = "--trials", description = "Number of simulation runs per iteration (team lifetime)")
         // Jamie calls this 'simulationRuns' (and 'lifetime' in his paper)
-        public static int trialsPerIndividual = 5;
+        public static int trialsPerIndividual = 1;
 
         @Parameter(names = "--conn-density", description = "Adjust the initial connection density"
                 + " for the population")
@@ -213,6 +229,9 @@ public class Main
 
         @Parameter(names = "--demo", description = "Show a GUI demo of a given genome")
         public static String genomePath = null;
+
+        @Parameter(names = "--evolvingMorph", description = "Toggle between evolving morphology and fixed morphology")
+        public static boolean evolvingMorphology = false;
 
         @Parameter(names = "--HyperNEATM", description = "Using HyperNEATM")
         public static boolean hyperNEATM = false;
@@ -243,6 +262,7 @@ public class Main
                     + "\tNumber of simulation tests per iteration: " + trialsPerIndividual + "\n"
                     + "\tInitial connection density: " + connectionDensity + "\n"
                     + "\tDemo network config path: " + genomePath + "\n"
+                    + "\tToggle between evolving morphology and fixed morphology: " + evolvingMorphology + "\n"
                     + "\tHyperNEATM: " + hyperNEATM + "\n"
                     + "\tPopulation path: " + populationPath + "\n"
                     + "\tNumber of threads: " + threads + "\n"

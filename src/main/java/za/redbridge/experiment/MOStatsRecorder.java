@@ -218,6 +218,22 @@ public class MOStatsRecorder extends StatsRecorder
         String filename = "epoch-" + epoch + ".ser";
         Path path = populationDirectory.resolve(filename);
         saveObjectToFile(population, path);
+
+        String filenametest = "epoch-" + epoch + ".csv";
+        Path neural = rootDirectory.resolve(filename);
+
+
+        try (BufferedWriter writer = Files.newBufferedWriter(neural, Charset.defaultCharset())) {
+            writer.write("task,sensor,neural\n");
+            for(Genome g : population.flatten()){
+                ArrayList<Double> l= ( (MultiObjectiveGenome) g).getScoreVector();
+                writer.write(l.get(0)+","+l.get(1)+","+l.get(2)+"/n");
+            }
+        } catch (IOException e) {
+            log.error("Unable to initialize stats file", e);
+        }
+
+
     }
 
     private Double normaliseComplexityScore(Double Score){

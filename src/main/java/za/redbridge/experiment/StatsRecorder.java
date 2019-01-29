@@ -44,6 +44,7 @@ public class StatsRecorder {
     private Path scoreStatsFile;
     private Path neuralStatsFile;
     private Path sensorStatsFile;
+
     private Path sensorParamStatsFile;
     private String txt;
     private NEATMNetwork nw;
@@ -92,6 +93,7 @@ public class StatsRecorder {
 
         bestNetworkDirectory = rootDirectory.resolve("best networks");
         initDirectory(bestNetworkDirectory);
+
     }
 
     private static void initDirectory(Path path) {
@@ -111,6 +113,8 @@ public class StatsRecorder {
 
         neuralStatsFile = rootDirectory.resolve("neural.csv");
         initStatsFile(neuralStatsFile);
+
+
 
         if (evolvingMorphology) {
             sensorStatsFile = rootDirectory.resolve("sensors.csv");
@@ -149,6 +153,7 @@ public class StatsRecorder {
         }
     }
 
+
     public void recordIterationStats() {
         int epoch = trainer.getIteration();
         log.info("Epoch " + epoch + " complete");
@@ -179,6 +184,7 @@ public class StatsRecorder {
         String filename = "epoch-" + epoch + ".ser";
         Path path = populationDirectory.resolve(filename);
         saveObjectToFile(population, path);
+
     }
 
     private void saveGenome(NEATGenome genome, int epoch) {

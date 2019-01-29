@@ -60,7 +60,8 @@ public class ScoreCalculator implements CalculateScore
         this.hyperNEATM = hyperNEATM;
 
         // If fixed morphology then don't record sensor stats
-        this.sensorStats = isEvolvingMorphology() ? new SynchronizedDescriptiveStatistics() : null;
+        //this.sensorStats = isEvolvingMorphology() ? new SynchronizedDescriptiveStatistics() : null;
+        this.sensorStats = new SynchronizedDescriptiveStatistics();
 
         for(int j =0;j<names.length;j++) {
             DescriptiveStatistics[] stats = new DescriptiveStatistics[3];
@@ -102,10 +103,12 @@ public class ScoreCalculator implements CalculateScore
 
         double score2 = calculateScore2(method);
 
-        if (isEvolvingMorphology() || hyperNEATM)
-        {
-            sensorStats.addValue(score2);
-        }
+//        if (isEvolvingMorphology() || hyperNEATM)
+//        {
+//            System.out.println("dwelliiiieeeessshhhh");
+//            sensorStats.addValue(score2);
+//        }
+        sensorStats.addValue(score2);
 
         double score3 = calculateScore3(method);
         neuralStats.addValue(score3);
@@ -114,15 +117,21 @@ public class ScoreCalculator implements CalculateScore
 
         TimeTakenStats.addValue(peformance/trialsPerIndividual);
 
-        SensorMorphology sensors = ((NEATMNetwork) network).getSensorMorphology();
-        for(int i =0;i<sensors.getNumSensors();i++){
-            AgentSensor sensor = sensors.getSensor(i);
-            if(!sensor.getClass().getSimpleName().equals("BottomProximitySensor")){
-                sensorParam.get(sensor.getClass().getSimpleName())[0].addValue(sensor.getFieldOfView());
-                sensorParam.get(sensor.getClass().getSimpleName())[1].addValue(sensor.getBearing());
-                sensorParam.get(sensor.getClass().getSimpleName())[2].addValue(sensor.getRange());
-            }
+        if(isEvolvingMorphology())
+        {
 
+            SensorMorphology sensors = ((NEATMNetwork) network).getSensorMorphology();
+            for (int i = 0; i < sensors.getNumSensors(); i++)
+            {
+                AgentSensor sensor = sensors.getSensor(i);
+                if (!sensor.getClass().getSimpleName().equals("BottomProximitySensor"))
+                {
+                    sensorParam.get(sensor.getClass().getSimpleName())[0].addValue(sensor.getFieldOfView());
+                    sensorParam.get(sensor.getClass().getSimpleName())[1].addValue(sensor.getBearing());
+                    sensorParam.get(sensor.getClass().getSimpleName())[2].addValue(sensor.getRange());
+                }
+
+            }
         }
 
         DecimalFormat df = new DecimalFormat("0.000");
@@ -136,10 +145,17 @@ public class ScoreCalculator implements CalculateScore
 
     public double calculateScore2(MLMethod method)  // second fitness function score (multi-objective) --> morphological complexity
     {
-        NEATMNetwork network = (NEATMNetwork) method;
+        SensorMorphology sensorMorph;
+        if(!isEvolvingMorphology())
+        {
+            sensorMorph = sensorMorphology;
+        }
+        else{
+            sensorMorph = ( (NEATMNetwork) method).getSensorMorphology();
+        }
         double score = 100;
-        for(int i =0;i< network.getSensorMorphology().getNumSensors();i++){
-            AgentSensor sensor =network.getSensorMorphology().getSensor(i);
+        for(int i =0;i< sensorMorph.getNumSensors();i++){
+            AgentSensor sensor =sensorMorph.getSensor(i);
 
             SensorType type=convertNameToType(sensor.getClass().getSimpleName());
             if(type ==SensorType.BOTTOM_PROXIMITY){
@@ -152,7 +168,7 @@ public class ScoreCalculator implements CalculateScore
 
                 //look at scores fov and remove
                 double removeFOVPercentage = calculateFractionWithinRange(type.getDefaultSpecSet().getParameterSpec(ParameterType.FIELD_OF_VIEW).getRange(), sensor.getFieldOfView());
-                score -= (5 * removeRangePercentage);
+                score -= (5 * removeFOVPercentage);
             }
 
 
@@ -163,9 +179,7 @@ public class ScoreCalculator implements CalculateScore
 
     public double calculateScore3(MLMethod method)  // neural complexity
     {
-        NEATMNetwork network = (NEATMNetwork) method;
-        System.out.println(network.getLinks().length);
-       // System.out.println((network.getLinks().length/100.0));
+        NEATNetwork network = (NEATNetwork) method;
         return 100-(network.getLinks().length/40.0)*100;
     }
 
