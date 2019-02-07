@@ -38,6 +38,7 @@ import static za.redbridge.experiment.Utils.readObjectFromFile;
 public class Main
 {
     private static final double CONVERGENCE_SCORE = 110;
+    private static double SUBSTRATE_RADIUS = 1.5;
 
     public static void main(String[] args) throws IOException
     {
@@ -93,11 +94,11 @@ public class Main
                 type = "HyperNEATM";
                 Substrate substrate;
                 if(options.evolvingMorphology){
-                    substrate = SubstrateFactory.createKheperaSubstrate(simConfig.getMinDistBetweenSensors(), simConfig.getRobotRadius());
+                    substrate = SubstrateFactory.createKheperaSubstrate(simConfig.getMinDistBetweenSensors(), SUBSTRATE_RADIUS);
                 }
                 else
                 {
-                    substrate = SubstrateFactory.createSubstrateFromSensorMorphology(morphology, simConfig.getRobotRadius());
+                    substrate = SubstrateFactory.createSubstrateFromSensorMorphology(morphology, SUBSTRATE_RADIUS);
                 }
                 population = new NEATMPopulation(substrate, options.populationSize, options.multiObjective, options.evolvingMorphology);
             }
@@ -227,27 +228,27 @@ public class Main
         // public static String configFile = "config/ConfigDifficult.yml";
 
         @Parameter(names = "-g", description = "Number of generations to train for")    // Jamie calls this 'iterations'
-        public static int numGenerations = 250;
+        public static int numGenerations = 150;
 
         @Parameter(names = "-p", description = "Initial population size")
-        public static int populationSize = 50;
+        public static int populationSize = 5;
 
         @Parameter(names = "--trials", description = "Number of simulation runs per iteration (team lifetime)")
         // Jamie calls this 'simulationRuns' (and 'lifetime' in his paper)
-        public static int trialsPerIndividual = 1;
+        public static int trialsPerIndividual = 3;
 
         @Parameter(names = "--conn-density", description = "Adjust the initial connection density"
                 + " for the population")
         //NEAT
-        public static double connectionDensity = 0.5;
+        //public static double connectionDensity = 0.5;
         //HyperNEAT
-        //private double connectionDensity = 0.9;
+        private double connectionDensity = 0.9;
 
         @Parameter(names = "--demo", description = "Show a GUI demo of a given genome")
         public static String genomePath = null;
 
         @Parameter(names = "--evolvingMorph", description = "Evolving morphology")
-        public static boolean evolvingMorphology = false;
+        public static boolean evolvingMorphology = true;
 
         @Parameter(names = "--HyperNEATM", description = "Using HyperNEATM")
         public static boolean hyperNEATM = true;

@@ -26,9 +26,6 @@ public class SubstrateFactory
 
     {
         Substrate substrate = new Substrate(2); // Substrate exists on a single 2D-Cartesian coordinate plane.
-        //improves distribution
-        radius=radius*10;
-
         for (double theta = 0; theta < Math.PI*2; theta+=distBetweenEachSensor)     // loop around circle substrate and place a possible
         {                                                                           // input sensor node, each separated by distBetweenEachSensor
            SubstrateNode inputNode = substrate.createInputNode();
@@ -58,8 +55,6 @@ public class SubstrateFactory
 
     {
         Substrate substrate = new Substrate(2); // Substrate exists on a single 2D-Cartesian coordinate plane.
-        //improves distribution
-        radius=radius*10;
 
         double distBetweenEachSensor = (Math.PI*2)/number_of_sensors;
 
@@ -92,9 +87,6 @@ public class SubstrateFactory
     public static Substrate createSubstrateFromSensorMorphology(SensorMorphology sensorMorphology, double radius)
     {
         Substrate substrate = new Substrate(2); // Substrate exists on a single 2D-Cartesian coordinate plane.
-        //improves distribution
-        radius=radius*10;
-
 
         for (int i =0;i<sensorMorphology.getNumSensors();i++)     // loop around circle substrate and place a possible
         {                                                                           // input sensor node, each separated by distBetweenEachSensor
