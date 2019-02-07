@@ -94,8 +94,9 @@ public class Main
                 if(options.evolvingMorphology){
                     substrate = SubstrateFactory.createKheperaSubstrate(simConfig.getMinDistBetweenSensors(), simConfig.getRobotRadius());
                 }
-                else{
-                    substrate = SubstrateFactory.createKheperaIIISubstrate(simConfig.getMinDistBetweenSensors(), simConfig.getRobotRadius());
+                else
+                {
+                    substrate = SubstrateFactory.createSubstrateFromSensorMorphology(morphology, simConfig.getRobotRadius());
                 }
                 population = new NEATMPopulation(substrate, options.populationSize, options.multiObjective, options.evolvingMorphology);
             }
