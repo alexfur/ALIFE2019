@@ -1,10 +1,9 @@
-package za.redbridge.experiment.HyperNEATM;
+package za.redbridge.experiment.HyperNEAT;
 
 import org.encog.ml.CalculateScore;
 import org.encog.ml.ea.opp.CompoundOperator;
 import org.encog.ml.ea.opp.selection.TruncationSelection;
 import org.encog.neural.hyperneat.HyperNEATCODEC;
-import org.encog.neural.hyperneat.substrate.Substrate;
 import org.encog.neural.neat.NEATCODEC;
 import org.encog.neural.neat.training.opp.*;
 import org.encog.neural.neat.training.opp.links.MutatePerturbLinkWeight;
@@ -16,29 +15,17 @@ import za.redbridge.experiment.NEAT.NEATPopulation;
 import za.redbridge.experiment.SingleObjective.SingleObjectiveEA;
 
 /**
- * NEAT does not make use of a special trainer. Typically the generic TrainEA
- * trainer is used. This utility class creates a NEAT compatible TrainEA class.
+ * HyperNEATUtil for regular HyperNEAT network.
  *
- * -----------------------------------------------------------------------------
- * http://www.cs.ucf.edu/~kstanley/ Encog's NEAT implementation was drawn from
- * the following three Journal Articles. For more complete BibTeX sources, see
- * NEATNetwork.java.
- *
- * Evolving Neural Networks Through Augmenting Topologies
- *
- * Generating Large-Scale Neural Networks Through Discovering Geometric
- * Regularities
- *
- * Automatic feature selection in neuroevolution
+ * Created by jamie on 2019/01/29
  */
-public class HyperNEATMUtil {
+public class HyperNEATUtil {
 
     public static SingleObjectiveEA constructNEATTrainer(
             final CalculateScore calculateScore, final int inputCount,
-            final int outputCount, final int populationSize, Substrate substrate) {
-        final NEATPopulation pop = new NEATPopulation(inputCount, outputCount,
+            final int outputCount, final int populationSize) {
+        final org.encog.neural.neat.NEATPopulation pop = new org.encog.neural.neat.NEATPopulation(inputCount, outputCount,
                 populationSize);
-        pop.setSubstrate(substrate);
         pop.reset();
         return constructNEATTrainer(pop, calculateScore);
     }
@@ -49,8 +36,8 @@ public class HyperNEATMUtil {
      * @param calculateScore The score function.
      * @return The NEAT EA trainer.
      */
-    public static SingleObjectiveEA constructNEATTrainer(final NEATPopulation population,
-                                               final CalculateScore calculateScore) {
+    public static SingleObjectiveEA constructNEATTrainer(final org.encog.neural.neat.NEATPopulation population,
+                                                         final CalculateScore calculateScore) {
         final SingleObjectiveEA result = new SingleObjectiveEA(population, calculateScore);
         result.setSpeciation(new OriginalNEATSpeciation());
 
@@ -123,3 +110,4 @@ public class HyperNEATMUtil {
         return result;
     }
 }
+

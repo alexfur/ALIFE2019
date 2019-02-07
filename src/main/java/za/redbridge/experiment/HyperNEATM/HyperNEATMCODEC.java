@@ -15,6 +15,7 @@ import org.encog.neural.neat.NEATCODEC;
 import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNetwork;
 import org.encog.neural.neat.training.NEATNeuronGene;
+import za.redbridge.experiment.Main;
 import za.redbridge.experiment.NEAT.NEATPopulation;
 import za.redbridge.experiment.NEATM.ActivationSteepenedShiftedSigmoid;
 import za.redbridge.experiment.NEATM.NEATMNetwork;
@@ -49,6 +50,7 @@ public class HyperNEATMCODEC implements GeneticCODEC, Serializable {
 
     public MLMethod decode(final NEATPopulation pop, final Substrate substrate, final Genome genome) {
         //obtain the CPPN
+
         final NEATCODEC neatCodec = new NEATCODEC();
         final NEATNetwork cppn = (NEATNetwork) neatCodec.decode(genome);
 
@@ -102,11 +104,21 @@ public class HyperNEATMCODEC implements GeneticCODEC, Serializable {
                     }
                     //update the sensors values
                     HyperNEATMSensorBuilder sensorBuilder = InputNodeSensorMap.get(IDUsing);
-                    sensorBuilder.addWeights((float) (output.getData(0)));
-                    sensorBuilder.addFOVs((float) (output.getData(1)));
-                    sensorBuilder.addOrientations((float) (output.getData(2)));
-                    sensorBuilder.addRanges((float) (output.getData(3)));
-                    sensorBuilder.addSensorTypes((float) (output.getData(4)));
+
+                    //todo: find a way to build a codec that builds the sensormorphology (also is this new if-else correct?)
+                    if(Main.Args.evolvingMorphology)
+                    {
+                        sensorBuilder.addWeights((float) (output.getData(0)));
+                        sensorBuilder.addFOVs((float) (output.getData(1)));
+                        sensorBuilder.addOrientations((float) (output.getData(2)));
+                        sensorBuilder.addRanges((float) (output.getData(3)));
+                        sensorBuilder.addSensorTypes((float) (output.getData(4)));
+                    }
+                    else
+                    {
+                        sensorBuilder.addWeights((float) (output.getData(0)));
+                    }
+
                     //ensures no memory issues (look into this)
                     InputNodeSensorMap.put(IDUsing, sensorBuilder);
 

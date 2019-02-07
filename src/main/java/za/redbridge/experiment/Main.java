@@ -90,8 +90,14 @@ public class Main
             if (options.hyperNEATM)
             {
                 type = "HyperNEATM";
-                Substrate substrate = SubstrateFactory.createKheperaSubstrate(simConfig.getMinDistBetweenSensors(), simConfig.getRobotRadius());
-                population = new NEATMPopulation(substrate, options.populationSize, options.multiObjective);
+                Substrate substrate;
+                if(options.evolvingMorphology){
+                    substrate = SubstrateFactory.createKheperaSubstrate(simConfig.getMinDistBetweenSensors(), simConfig.getRobotRadius());
+                }
+                else{
+                    substrate = SubstrateFactory.createKheperaIIISubstrate(simConfig.getMinDistBetweenSensors(), simConfig.getRobotRadius());
+                }
+                population = new NEATMPopulation(substrate, options.populationSize, options.multiObjective, options.evolvingMorphology);
             }
             else
             {
@@ -115,7 +121,13 @@ public class Main
             else
             {
                 //@todo add in HyperNEATUtil
-                train = HyperNEATMUtil.constructNEATTrainer(population, calculateScore);
+                if(options.evolvingMorphology){
+                    train = HyperNEATMUtil.constructNEATTrainer(population, calculateScore);
+                }
+                else{
+                    train = HyperNEATMUtil.constructNEATTrainer(population, calculateScore);
+                }
+
                 ((SingleObjectiveEA) train).setCODEC(new HyperNEATMCODEC());
             }
         }
@@ -230,11 +242,11 @@ public class Main
         @Parameter(names = "--demo", description = "Show a GUI demo of a given genome")
         public static String genomePath = null;
 
-        @Parameter(names = "--evolvingMorph", description = "Toggle between evolving morphology and fixed morphology")
+        @Parameter(names = "--evolvingMorph", description = "Evolving morphology")
         public static boolean evolvingMorphology = false;
 
         @Parameter(names = "--HyperNEATM", description = "Using HyperNEATM")
-        public static boolean hyperNEATM = false;
+        public static boolean hyperNEATM = true;
 
         @Parameter(names = "--population", description = "To resume a previous experiment, provide"
                 + " the path to a serialized population")
@@ -262,7 +274,7 @@ public class Main
                     + "\tNumber of simulation tests per iteration: " + trialsPerIndividual + "\n"
                     + "\tInitial connection density: " + connectionDensity + "\n"
                     + "\tDemo network config path: " + genomePath + "\n"
-                    + "\tToggle between evolving morphology and fixed morphology: " + evolvingMorphology + "\n"
+                    + "\tEvolving morphology: " + evolvingMorphology + "\n"
                     + "\tHyperNEATM: " + hyperNEATM + "\n"
                     + "\tPopulation path: " + populationPath + "\n"
                     + "\tNumber of threads: " + threads + "\n"

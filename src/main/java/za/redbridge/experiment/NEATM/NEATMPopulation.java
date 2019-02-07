@@ -56,13 +56,21 @@ public class NEATMPopulation extends NEATPopulation
      * @param populationSize
      *            Number of CPPNs in each generation.
      */
-    public NEATMPopulation(final Substrate theSubstrate, final int populationSize, boolean multiObjective)
+    public NEATMPopulation(final Substrate theSubstrate, final int populationSize, boolean multiObjective, boolean evolvingMorph)
     {
         super(theSubstrate, populationSize);
         setInputCount(4);
-        setOutputCount(6);
+        if(evolvingMorph)
+        {
+            setOutputCount(6);
+        }
+        else{
+            setOutputCount(1);
+        }
         this.multiObjective = multiObjective;
     }
+
+
 
 
     @Override

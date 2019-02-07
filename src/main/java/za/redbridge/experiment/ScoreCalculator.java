@@ -103,11 +103,6 @@ public class ScoreCalculator implements CalculateScore
 
         double score2 = calculateScore2(method);
 
-//        if (isEvolvingMorphology() || hyperNEATM)
-//        {
-//            System.out.println("dwelliiiieeeessshhhh");
-//            sensorStats.addValue(score2);
-//        }
         sensorStats.addValue(score2);
 
         double score3 = calculateScore3(method);
