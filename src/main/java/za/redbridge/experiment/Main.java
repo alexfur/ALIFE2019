@@ -8,6 +8,7 @@ import org.encog.neural.hyperneat.substrate.Substrate;
 import org.encog.neural.neat.NEATNetwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import za.redbridge.experiment.HyperNEAT.HyperNEATCODEC;
 import za.redbridge.experiment.HyperNEATM.HyperNEATMCODEC;
 import za.redbridge.experiment.HyperNEATM.HyperNEATMUtil;
 import za.redbridge.experiment.HyperNEATM.SubstrateFactory;
@@ -119,17 +120,19 @@ public class Main
                 type = "MO-" + type;
                 train = MultiObjectiveHyperNEATUtil.constructNEATTrainer(population, calculateScore, options.numGenerations);
             }
-            else
+            else // single objective
             {
                 //@todo add in HyperNEATUtil
                 if(options.evolvingMorphology){
                     train = HyperNEATMUtil.constructNEATTrainer(population, calculateScore);
+                    ((SingleObjectiveEA) train).setCODEC(new HyperNEATMCODEC());
                 }
                 else{
                     train = HyperNEATMUtil.constructNEATTrainer(population, calculateScore);
+                    ((SingleObjectiveEA) train).setCODEC(new HyperNEATCODEC(morphology));
                 }
 
-                ((SingleObjectiveEA) train).setCODEC(new HyperNEATMCODEC());
+
             }
         }
         else    // if NEATM

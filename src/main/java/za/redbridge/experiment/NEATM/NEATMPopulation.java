@@ -65,7 +65,7 @@ public class NEATMPopulation extends NEATPopulation
             setOutputCount(6);
         }
         else{
-            setOutputCount(1);
+            setOutputCount(2);
         }
         this.multiObjective = multiObjective;
     }
