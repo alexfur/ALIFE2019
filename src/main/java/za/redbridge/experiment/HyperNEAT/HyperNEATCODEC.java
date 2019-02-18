@@ -126,7 +126,7 @@ public class HyperNEATCODEC implements GeneticCODEC, Serializable
 
 
 
-
+        if(sensorMorphology==null) System.out.println("hello null");
         final NEATMNetwork network = new NEATMNetwork(sensorMorphology.getNumSensors(), substrate.getOutputCount(), linkList, afs, sensorMorphology);
         network.setActivationCycles(substrate.getActivationCycles());
 

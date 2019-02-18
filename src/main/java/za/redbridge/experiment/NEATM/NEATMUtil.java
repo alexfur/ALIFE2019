@@ -11,6 +11,7 @@ import org.encog.neural.neat.training.opp.links.MutatePerturbLinkWeight;
 import org.encog.neural.neat.training.opp.links.MutateResetLinkWeight;
 import org.encog.neural.neat.training.opp.links.SelectFixed;
 import org.encog.neural.neat.training.opp.links.SelectProportion;
+import za.redbridge.experiment.NEATM.sensor.SensorMorphology;
 import za.redbridge.experiment.NEATM.sensor.SensorType;
 import za.redbridge.experiment.NEATM.training.opp.*;
 import za.redbridge.experiment.NEATM.training.opp.sensors.MutatePerturbSensorParameter;
@@ -28,8 +29,8 @@ import static za.redbridge.experiment.NEATM.sensor.parameter.spec.ParameterType.
 public final class NEATMUtil {
 
     public static SingleObjectiveEA constructNEATTrainer(CalculateScore calculateScore, int outputCount,
-            int populationSize) {
-        final NEATMPopulation pop = new NEATMPopulation(outputCount, populationSize, false);
+                                                         int populationSize, SensorMorphology sensorMorphology) {
+        final NEATMPopulation pop = new NEATMPopulation(outputCount, populationSize, false, sensorMorphology);
         pop.reset();
         return constructNEATTrainer(pop, calculateScore);
     }

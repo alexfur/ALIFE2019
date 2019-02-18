@@ -15,6 +15,7 @@ import org.encog.neural.neat.training.opp.links.SelectProportion;
 import org.encog.neural.neat.training.species.OriginalNEATSpeciation;
 import za.redbridge.experiment.NEATM.NEATMCODEC;
 import za.redbridge.experiment.NEATM.NEATMPopulation;
+import za.redbridge.experiment.NEATM.sensor.SensorMorphology;
 import za.redbridge.experiment.NEATM.sensor.SensorType;
 import za.redbridge.experiment.NEATM.training.opp.*;
 import za.redbridge.experiment.NEATM.training.opp.sensors.MutatePerturbSensorParameter;
@@ -30,8 +31,8 @@ import static za.redbridge.experiment.NEATM.sensor.parameter.spec.ParameterType.
 public class MultiObjectiveNEATMUtil
 {
     public static MultiObjectiveEA constructNEATTrainer(CalculateScore calculateScore, int outputCount,
-                                               int populationSize, int numGenerations) {
-        final NEATMPopulation pop = new NEATMPopulation(outputCount, populationSize, true);
+                                                        int populationSize, int numGenerations, SensorMorphology sensorMorphology) {
+        final NEATMPopulation pop = new NEATMPopulation(outputCount, populationSize, true, sensorMorphology);
         pop.reset();
         return constructNEATTrainer(pop, calculateScore, numGenerations);
     }

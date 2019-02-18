@@ -17,8 +17,7 @@ public class ChasingPhenotype extends KheperaIIIPhenotype {
 
     private static final Configuration CONFIG = new Configuration();
     static {
-        CONFIG.enableUltrasonicSensor0Degrees = true;
-        CONFIG.enableUltrasonicSensors40Degrees = true;
+        CONFIG.hyperNEATConfiguration = true;
     }
 
     public ChasingPhenotype() {

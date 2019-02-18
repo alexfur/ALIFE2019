@@ -22,13 +22,13 @@ import java.util.Map;
 
 public class ColourProximitySensor extends AgentSensor {
 
-    public static final float RANGE = 0.6f;
-    public static final float FIELD_OF_VIEW = 0.4f; // This is a guess
+    public static final float RANGE = 1f;
+    public static final float FIELD_OF_VIEW = 1f;
 
     public static final Color SensorColor = new Color(128, 0, 128, 50);
 
-    public ColourProximitySensor(float bearing) {
-        this(bearing, 0.0f, RANGE, FIELD_OF_VIEW);
+    public ColourProximitySensor(float bearing, float orientation) {
+        this(bearing, orientation, RANGE, FIELD_OF_VIEW);
     }
 
     public ColourProximitySensor(float bearing, float orientation, float range,

@@ -7,9 +7,12 @@ import org.encog.neural.neat.training.NEATInnovationList;
 
 import java.util.Random;
 
+import za.redbridge.experiment.HyperNEAT.HyperNEATCODEC;
 import za.redbridge.experiment.HyperNEATM.HyperNEATMCODEC;
+import za.redbridge.experiment.Main;
 import za.redbridge.experiment.MultiObjective.FactorMultiObjectiveHyperNEATGenome;
 import za.redbridge.experiment.MultiObjective.FactorMultiObjectiveNEATMGenome;
+import za.redbridge.experiment.NEATM.sensor.SensorMorphology;
 import za.redbridge.experiment.NEATM.sensor.SensorType;
 import za.redbridge.experiment.NEAT.NEATPopulation;
 
@@ -20,6 +23,7 @@ public class NEATMPopulation extends NEATPopulation
 {
 
     private static final long serialVersionUID = -6647644833955733411L;
+    private SensorMorphology sensorMorphology;
 
     /**
      * An empty constructor for serialization.
@@ -38,11 +42,13 @@ public class NEATMPopulation extends NEATPopulation
      * @param outputCount    The output neuron count.
      * @param populationSize The population size.
      */
-    public NEATMPopulation(int outputCount, int populationSize, boolean multiObjective)
+    public NEATMPopulation(int outputCount, int populationSize, boolean multiObjective, SensorMorphology sensorMorphology)
     {
         super(SensorType.values().length, outputCount, populationSize); // inputCount = SensorType.values().length
                                                                         // This is because initial population begins with one of each sensor type.
         this.multiObjective = multiObjective;
+
+        this.sensorMorphology = sensorMorphology;
     }
 
 
@@ -56,7 +62,7 @@ public class NEATMPopulation extends NEATPopulation
      * @param populationSize
      *            Number of CPPNs in each generation.
      */
-    public NEATMPopulation(final Substrate theSubstrate, final int populationSize, boolean multiObjective, boolean evolvingMorph)
+    public NEATMPopulation(final Substrate theSubstrate, final int populationSize, boolean multiObjective, boolean evolvingMorph, SensorMorphology sensorMorphology)
     {
         super(theSubstrate, populationSize);
         setInputCount(4);
@@ -68,6 +74,7 @@ public class NEATMPopulation extends NEATPopulation
             setOutputCount(2);
         }
         this.multiObjective = multiObjective;
+        this.sensorMorphology = sensorMorphology;
     }
 
 
@@ -79,7 +86,11 @@ public class NEATMPopulation extends NEATPopulation
         // create the genome factory
         if (isHyperNEAT())                                  // Just checks if NEAT(M)Population has a valid substrate.
         {
-            setCODEC(new HyperNEATMCODEC());
+            if(Main.Args.evolvingMorphology)
+                setCODEC(new HyperNEATMCODEC());
+            else
+                setCODEC(new HyperNEATCODEC(sensorMorphology));
+
             if(multiObjective)
             {
                 setGenomeFactory(new FactorMultiObjectiveHyperNEATGenome());

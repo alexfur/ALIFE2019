@@ -18,7 +18,7 @@ import za.redbridge.simulator.sensor.sensedobjects.SensedObject;
  */
 public class UltrasonicSensor extends AgentSensor {
 
-    public static final float RANGE = 4.0f; // 4 meters
+    public static final float RANGE = 2.0f; // 4 meters
     public static final float RANGE_NO_DISTANCE = 0.2f; // 20 centimeters
     public static final float FIELD_OF_VIEW = 1.22f; // 35 degrees
 

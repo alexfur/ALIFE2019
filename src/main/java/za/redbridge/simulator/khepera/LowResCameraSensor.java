@@ -23,14 +23,14 @@ import java.util.Map;
 
 public class LowResCameraSensor extends AgentSensor
 {
-    private static final float LOWRES_SENSOR_RANGE = 3.0f;
-    private static final float LOWRES_SENSOR_FOV = 1.5f; // This is a guess
+    public static final float RANGE = 3.0f;
+    public static final float FOV = 1f;
 
     public static final Color SensorColor = new Color(0, 255, 255, 50);
 
     public LowResCameraSensor(float bearing, float orientation)
     {
-        this(bearing, orientation, LOWRES_SENSOR_RANGE, LOWRES_SENSOR_FOV);
+        this(bearing, orientation, RANGE, FOV);
     }
 
     public LowResCameraSensor(float bearing, float orientation, float range, float fieldOfView)

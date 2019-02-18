@@ -41,48 +41,27 @@ public abstract class KheperaIIIPhenotype implements Phenotype {
 
     private void initSensors() {
         // Proximity sensors
-        if (configuration.enableProximitySensors10Degrees) {
-            sensors.add(createProximitySensor((float) Math.toRadians(10), 0f));
-            sensors.add(createProximitySensor((float) Math.toRadians(-10), 0f));
-        }
 
-        if (configuration.enableProximitySensors40Degrees) {
-            sensors.add(createProximitySensor((float) Math.toRadians(40), 0f));
-            sensors.add(createProximitySensor((float) Math.toRadians(-40), 0f));
-        }
-
-        if (configuration.enableProximitySensors75Degrees) {
-            sensors.add(createProximitySensor((float) Math.toRadians(75), 0f));
-            sensors.add(createProximitySensor((float) Math.toRadians(-75), 0f));
-        }
-
-        if (configuration.enableProximitySensors140Degrees) {
-            sensors.add(createProximitySensor((float) Math.toRadians(140), 0f));
-            sensors.add(createProximitySensor((float) Math.toRadians(-140), 0f));
-        }
-
-        if (configuration.enableProximitySensor180Degrees) {
-            sensors.add(createProximitySensor((float) Math.PI, 0f));
-        }
-
-        if (configuration.enableProximitySensorBottom) {
+        if(configuration.hyperNEATConfiguration){
+            sensors.add(createLowResCameraSensor((float) Math.toRadians(0), 0f));
+            //cp
+            sensors.add(createColorPrixmitySensor((float) Math.toRadians(30), 0f));
+            sensors.add(createColorPrixmitySensor((float) Math.toRadians(-30), 0f));
+            //ultra
+            sensors.add(createUltrasonicSensor((float) Math.toRadians(60), 0f));
+            sensors.add(createUltrasonicSensor((float) Math.toRadians(-60), 0f));
+            //proximity
+            sensors.add(createProximitySensor((float) Math.toRadians(120), 0f));
+            sensors.add(createProximitySensor((float) Math.toRadians(-120), 0f));
+            //bottom proximity
             sensors.add(createBottomProximitySensor());
         }
 
-        // Ultrasonic sensors
-        if (configuration.enableUltrasonicSensor0Degrees) {
-            sensors.add(createUltrasonicSensor(0f, 0f));
-        }
 
-        if (configuration.enableUltrasonicSensors40Degrees) {
-            sensors.add(createUltrasonicSensor((float) Math.toRadians(40), 0f));
-            sensors.add(createUltrasonicSensor((float) Math.toRadians(-40), 0f));
-        }
 
-        if (configuration.enableUltrasonicSensors90Degrees) {
-            sensors.add(createUltrasonicSensor((float) Math.PI / 2, 0f));
-            sensors.add(createUltrasonicSensor((float) -Math.PI / 2, 0f));
-        }
+
+
+
     }
 
     /** Method can be overridden to customize proximity sensor */
@@ -98,6 +77,15 @@ public abstract class KheperaIIIPhenotype implements Phenotype {
     /** Method can be overridden to customize ultrasonic sensor */
     protected AgentSensor createUltrasonicSensor(float bearing, float orientation) {
         return new UltrasonicSensor(bearing, orientation);
+    }
+
+    /** Method can be overridden to customize low res camera sensr */
+    protected AgentSensor createLowResCameraSensor(float bearing, float orientation) {
+        return new LowResCameraSensor(bearing, orientation);
+    }
+
+    protected AgentSensor createColorPrixmitySensor(float bearing, float orientation) {
+        return new ColourProximitySensor(bearing, orientation);
     }
 
     /** Returns a copy of the current configuration */
@@ -127,47 +115,23 @@ public abstract class KheperaIIIPhenotype implements Phenotype {
      * By default all sensors are disabled.
      */
     public static class Configuration {
-        public boolean enableProximitySensors10Degrees = false;
-        public boolean enableProximitySensors40Degrees = false;
-        public boolean enableProximitySensors75Degrees = false;
-        public boolean enableProximitySensors140Degrees = false;
-        public boolean enableProximitySensor180Degrees = false;
 
-        public boolean enableProximitySensorBottom = false;
-        
-        public boolean enableUltrasonicSensor0Degrees = false;
-        public boolean enableUltrasonicSensors40Degrees = false;
-        public boolean enableUltrasonicSensors90Degrees = false;
+        public boolean hyperNEATConfiguration = true;
+
+
 
         public Configuration() {
         }
 
         private Configuration(Configuration other) {
-            this.enableProximitySensors10Degrees = other.enableProximitySensors10Degrees;
-            this.enableProximitySensors40Degrees = other.enableProximitySensors40Degrees;
-            this.enableProximitySensors75Degrees = other.enableProximitySensors75Degrees;
-            this.enableProximitySensors140Degrees = other.enableProximitySensors140Degrees;
-            this.enableProximitySensor180Degrees = other.enableProximitySensor180Degrees;
-
-            this.enableProximitySensorBottom = other.enableProximitySensorBottom;
-
-            this.enableUltrasonicSensor0Degrees = other.enableUltrasonicSensor0Degrees;
-            this.enableUltrasonicSensors40Degrees = other.enableUltrasonicSensors40Degrees;
-            this.enableUltrasonicSensors90Degrees = other.enableUltrasonicSensors90Degrees;
+            this.hyperNEATConfiguration = other.hyperNEATConfiguration;
         }
         
         public int getNumberOfSensors() {
             int numSensors = 0;
-            
-            if (enableProximitySensors10Degrees) numSensors += 2;
-            if (enableProximitySensors40Degrees) numSensors += 2;
-            if (enableProximitySensors75Degrees) numSensors += 2;
-            if (enableProximitySensors140Degrees) numSensors += 2;
-            if (enableProximitySensor180Degrees) numSensors += 1;
-            if (enableProximitySensorBottom) numSensors += 1;
-            if (enableUltrasonicSensor0Degrees) numSensors += 1;
-            if (enableUltrasonicSensors40Degrees) numSensors += 2;
-            if (enableUltrasonicSensors90Degrees) numSensors += 2;
+
+            if (hyperNEATConfiguration) numSensors += 8;
+
             
             return numSensors;
         }

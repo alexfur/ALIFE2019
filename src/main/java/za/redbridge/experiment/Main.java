@@ -9,6 +9,7 @@ import org.encog.neural.neat.NEATNetwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import za.redbridge.experiment.HyperNEAT.HyperNEATCODEC;
+import za.redbridge.experiment.HyperNEAT.HyperNEATUtil;
 import za.redbridge.experiment.HyperNEATM.HyperNEATMCODEC;
 import za.redbridge.experiment.HyperNEATM.HyperNEATMUtil;
 import za.redbridge.experiment.HyperNEATM.SubstrateFactory;
@@ -38,7 +39,7 @@ import static za.redbridge.experiment.Utils.readObjectFromFile;
 public class Main
 {
     private static final double CONVERGENCE_SCORE = 110;
-    private static double SUBSTRATE_RADIUS = 1.5;
+    private static double SUBSTRATE_RADIUS = 1;
 
     public static void main(String[] args) throws IOException
     {
@@ -100,12 +101,12 @@ public class Main
                 {
                     substrate = SubstrateFactory.createSubstrateFromSensorMorphology(morphology, SUBSTRATE_RADIUS);
                 }
-                population = new NEATMPopulation(substrate, options.populationSize, options.multiObjective, options.evolvingMorphology);
+                population = new NEATMPopulation(substrate, options.populationSize, options.multiObjective, options.evolvingMorphology, morphology);
             }
             else
             {
                 type = "NEATM";
-                population = new NEATMPopulation(2, options.populationSize, options.multiObjective);
+                population = new NEATMPopulation(2, options.populationSize, options.multiObjective, morphology);
             }
             population.setInitialConnectionDensity(options.connectionDensity);
             population.reset();
@@ -123,13 +124,12 @@ public class Main
             }
             else // single objective
             {
-                //@todo add in HyperNEATUtil
                 if(options.evolvingMorphology){
                     train = HyperNEATMUtil.constructNEATTrainer(population, calculateScore);
                     ((SingleObjectiveEA) train).setCODEC(new HyperNEATMCODEC());
                 }
                 else{
-                    train = HyperNEATMUtil.constructNEATTrainer(population, calculateScore);
+                    train = HyperNEATUtil.constructNEATTrainer(population, calculateScore);
                     ((SingleObjectiveEA) train).setCODEC(new HyperNEATCODEC(morphology));
                 }
 
@@ -215,20 +215,20 @@ public class Main
         Encog.getInstance().shutdown();
 
         // #alex - save best network and run demo on it
-        //NEATNetwork bestPerformingNetwork = (NEATNetwork) train.getCODEC().decode(train.getBestGenome());   //extract best performing NN from the population
-        //calculateScore.demo(bestPerformingNetwork);
+        NEATNetwork bestPerformingNetwork = (NEATNetwork) train.getCODEC().decode(train.getBestGenome());   //extract best performing NN from the population
+        calculateScore.demo(bestPerformingNetwork);
     }
 
     public static class Args
     {
         @Parameter(names = "-c", description = "Simulation config file to load")
         //public static String configFile = "config/bossConfig.yml";
-      // public static String configFile = "config/ConfigSimple.yml";
-        public static String configFile = "config/ConfigMedium.yml";
+        public static String configFile = "config/ConfigSimple.yml";
+        //public static String configFile = "config/ConfigMedium.yml";
         // public static String configFile = "config/ConfigDifficult.yml";
 
         @Parameter(names = "-g", description = "Number of generations to train for")    // Jamie calls this 'iterations'
-        public static int numGenerations = 150;
+        public static int numGenerations = 250;
 
         @Parameter(names = "-p", description = "Initial population size")
         public static int populationSize = 150;
@@ -242,13 +242,13 @@ public class Main
         //NEAT
         //public static double connectionDensity = 0.5;
         //HyperNEAT
-        private double connectionDensity = 0.9;
+        private double connectionDensity = 0.8;
 
         @Parameter(names = "--demo", description = "Show a GUI demo of a given genome")
         public static String genomePath = null;
 
         @Parameter(names = "--evolvingMorph", description = "Evolving morphology")
-        public static boolean evolvingMorphology = true;
+        public static boolean evolvingMorphology = false;
 
         @Parameter(names = "--HyperNEATM", description = "Using HyperNEATM")
         public static boolean hyperNEATM = true;

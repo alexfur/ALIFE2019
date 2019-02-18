@@ -19,8 +19,8 @@ import za.redbridge.simulator.sensor.sensedobjects.SensedObject;
  */
 public class ProximitySensor extends AgentSensor {
 
-    public static final float RANGE = 0.2f;
-    public static final float FIELD_OF_VIEW = 0.2f; // This is a guess
+    public static final float RANGE = 1.8f;
+    public static final float FIELD_OF_VIEW = 0.4f*2;
 
     public static final Color SensorColour = new Color(255, 0, 0, 50);
 

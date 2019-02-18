@@ -3,16 +3,11 @@ package za.redbridge.experiment;
 import za.redbridge.experiment.NEATM.sensor.SensorModel;
 import za.redbridge.experiment.NEATM.sensor.SensorMorphology;
 
-import za.redbridge.simulator.khepera.KheperaIIIPhenotype;
-import za.redbridge.simulator.khepera.ProximitySensor;
-import za.redbridge.simulator.khepera.UltrasonicSensor;
+import za.redbridge.simulator.khepera.*;
 
 //import za.redbridge.experiment.NEATM.sensor.parameter.spec.ParameterType.*;
+import static za.redbridge.experiment.NEATM.sensor.SensorType.*;
 
-
-import static za.redbridge.experiment.NEATM.sensor.SensorType.BOTTOM_PROXIMITY;
-import static za.redbridge.experiment.NEATM.sensor.SensorType.PROXIMITY;
-import static za.redbridge.experiment.NEATM.sensor.SensorType.ULTRASONIC;
 
 /**
  * A horrible adapter class for different representations of morphologies. Creates a
@@ -30,10 +25,7 @@ public class KheperaIIIMorphology extends SensorMorphology
 
     static
     {
-        DEFAULT_CONFIGURATION.enableProximitySensors40Degrees = true;
-        DEFAULT_CONFIGURATION.enableProximitySensorBottom = true;
-        DEFAULT_CONFIGURATION.enableUltrasonicSensor0Degrees = true;
-        DEFAULT_CONFIGURATION.enableUltrasonicSensors90Degrees = true;
+        DEFAULT_CONFIGURATION.hyperNEATConfiguration = true;
     }
 
     public KheperaIIIMorphology()
@@ -52,76 +44,23 @@ public class KheperaIIIMorphology extends SensorMorphology
         final int sensorCount = config.getNumberOfSensors();
         SensorModel[] sensorModels = new SensorModel[sensorCount];
 
-        if (config.enableProximitySensorBottom)
+        if (config.hyperNEATConfiguration)
         {
             sensorModels[sensorIndex++] = new SensorModel(BOTTOM_PROXIMITY);
+            //low res cam
+            sensorModels[sensorIndex++] = new SensorModel(LOW_RES_CAM, (float) Math.toRadians(0),0, LowResCameraSensor.RANGE, LowResCameraSensor.FOV);
+            //cp
+            sensorModels[sensorIndex++] = new SensorModel(COLOUR_PROXIMITY, (float) Math.toRadians(30),0, ColourProximitySensor.RANGE, ColourProximitySensor.FIELD_OF_VIEW);
+            sensorModels[sensorIndex++] = new SensorModel(COLOUR_PROXIMITY, (float) Math.toRadians(-30),0, ColourProximitySensor.RANGE, ColourProximitySensor.FIELD_OF_VIEW);
+            //ultrasonic
+            sensorModels[sensorIndex++] = new SensorModel(ULTRASONIC, (float) Math.toRadians(60),0, UltrasonicSensor.RANGE, UltrasonicSensor.FIELD_OF_VIEW);
+            sensorModels[sensorIndex++] = new SensorModel(ULTRASONIC, (float) Math.toRadians(-60),0, UltrasonicSensor.RANGE, UltrasonicSensor.FIELD_OF_VIEW);
+            // proximity
+            sensorModels[sensorIndex++] = new SensorModel(PROXIMITY, (float) Math.toRadians(120),0, ProximitySensor.RANGE,ProximitySensor.FIELD_OF_VIEW);
+            sensorModels[sensorIndex++] = new SensorModel(PROXIMITY, (float) Math.toRadians(-120),0, ProximitySensor.RANGE, ProximitySensor.FIELD_OF_VIEW);
         }
 
-        if (config.enableProximitySensors10Degrees)
-        {
-            sensorModels[sensorIndex++] = new SensorModel(PROXIMITY, (float) Math.toRadians(10), 0,
-                    ProximitySensor.RANGE, ProximitySensor.FIELD_OF_VIEW);
 
-            sensorModels[sensorIndex++] = new SensorModel(PROXIMITY, (float) Math.toRadians(-10), 0,
-                    ProximitySensor.RANGE, ProximitySensor.FIELD_OF_VIEW);
-        }
-
-        if (config.enableProximitySensors40Degrees)
-        {
-            sensorModels[sensorIndex++] = new SensorModel(PROXIMITY, (float) Math.toRadians(40), 0,
-                    ProximitySensor.RANGE, ProximitySensor.FIELD_OF_VIEW);
-
-            sensorModels[sensorIndex++] = new SensorModel(PROXIMITY, (float) Math.toRadians(-40), 0,
-                    ProximitySensor.RANGE, ProximitySensor.FIELD_OF_VIEW);
-        }
-
-        if (config.enableProximitySensors75Degrees)
-        {
-            sensorModels[sensorIndex++] = new SensorModel(PROXIMITY, (float) Math.toRadians(75), 0,
-                    ProximitySensor.RANGE, ProximitySensor.FIELD_OF_VIEW);
-
-            sensorModels[sensorIndex++] = new SensorModel(PROXIMITY, (float) Math.toRadians(-75), 0,
-                    ProximitySensor.RANGE, ProximitySensor.FIELD_OF_VIEW);
-        }
-
-        if (config.enableProximitySensors140Degrees)
-        {
-            sensorModels[sensorIndex++] = new SensorModel(PROXIMITY, (float) Math.toRadians(140), 0,
-                    ProximitySensor.RANGE, ProximitySensor.FIELD_OF_VIEW);
-
-            sensorModels[sensorIndex++] = new SensorModel(PROXIMITY, (float) Math.toRadians(-140),
-                    0, ProximitySensor.RANGE, ProximitySensor.FIELD_OF_VIEW);
-        }
-
-        if (config.enableProximitySensor180Degrees)
-        {
-            sensorModels[sensorIndex++] = new SensorModel(PROXIMITY, (float) Math.toRadians(180), 0,
-                    ProximitySensor.RANGE, ProximitySensor.FIELD_OF_VIEW);
-        }
-
-        if (config.enableUltrasonicSensor0Degrees)
-        {
-            sensorModels[sensorIndex++] = new SensorModel(ULTRASONIC, 0, 0,
-                    UltrasonicSensor.RANGE, UltrasonicSensor.FIELD_OF_VIEW);
-        }
-
-        if (config.enableUltrasonicSensors40Degrees)
-        {
-            sensorModels[sensorIndex++] = new SensorModel(ULTRASONIC, (float) Math.toRadians(40), 0,
-                    UltrasonicSensor.RANGE, UltrasonicSensor.FIELD_OF_VIEW);
-
-            sensorModels[sensorIndex++] = new SensorModel(ULTRASONIC, (float) Math.toRadians(-40),
-                    0, UltrasonicSensor.RANGE, UltrasonicSensor.FIELD_OF_VIEW);
-        }
-
-        if (config.enableUltrasonicSensors90Degrees)
-        {
-            sensorModels[sensorIndex++] = new SensorModel(ULTRASONIC, (float) Math.toRadians(90), 0,
-                    UltrasonicSensor.RANGE, UltrasonicSensor.FIELD_OF_VIEW);
-
-            sensorModels[sensorIndex] = new SensorModel(ULTRASONIC, (float) Math.toRadians(-90), 0,
-                    UltrasonicSensor.RANGE, UltrasonicSensor.FIELD_OF_VIEW);
-        }
 
         return sensorModels;
     }
