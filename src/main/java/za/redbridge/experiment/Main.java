@@ -195,14 +195,14 @@ public class Main
         // public static String configFile = "config/ConfigDifficult.yml";
 
         @Parameter(names = "-g", description = "Number of generations to train for")    // Jamie calls this 'iterations'
-        public static int numGenerations = 250;
+        public static int numGenerations = 200;
 
         @Parameter(names = "-p", description = "Initial population size")
         public static int populationSize = 150;
 
         @Parameter(names = "--trials", description = "Number of simulation runs per iteration (team lifetime)")
         // Jamie calls this 'simulationRuns' (and 'lifetime' in his paper)
-        public static int trialsPerIndividual = 5;
+        public static int trialsPerIndividual = 3;
 
         @Parameter(names = "--conn-density", description = "Adjust the initial connection density"
                 + " for the population")
