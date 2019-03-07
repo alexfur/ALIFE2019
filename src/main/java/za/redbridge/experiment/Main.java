@@ -3,9 +3,13 @@ package za.redbridge.experiment;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.encog.Encog;
+import org.encog.ml.ea.genome.Genome;
 import org.encog.ml.ea.train.EvolutionaryAlgorithm;
 import org.encog.neural.hyperneat.substrate.Substrate;
 import org.encog.neural.neat.NEATNetwork;
+import org.encog.neural.neat.NEATPopulation;
+import org.encog.neural.neat.training.NEATGenome;
+import org.encog.neural.neat.training.NEATLinkGene;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import za.redbridge.experiment.HyperNEAT.HyperNEATCODEC;
@@ -16,7 +20,6 @@ import za.redbridge.experiment.HyperNEATM.SubstrateFactory;
 import za.redbridge.experiment.MultiObjective.MultiObjectiveEA;
 import za.redbridge.experiment.MultiObjective.MultiObjectiveHyperNEATUtil;
 import za.redbridge.experiment.MultiObjective.MultiObjectiveNEATMUtil;
-import za.redbridge.experiment.NEAT.NEATPopulation;
 import za.redbridge.experiment.NEAT.NEATUtil;
 import za.redbridge.experiment.NEATM.NEATMPopulation;
 import za.redbridge.experiment.NEATM.NEATMUtil;
@@ -24,8 +27,13 @@ import za.redbridge.experiment.NEATM.sensor.SensorMorphology;
 import za.redbridge.experiment.SingleObjective.SingleObjectiveEA;
 import za.redbridge.simulator.config.SimConfig;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import static za.redbridge.experiment.Utils.isBlank;
@@ -43,199 +51,87 @@ public class Main
 
     public static void main(String[] args) throws IOException
     {
-        String date = new SimpleDateFormat("MMdd'T'HHmm").format(new Date());
-        System.setProperty("log.name", "logback-"+date+".log");
-        Utils.date = date;
-
-        Logger log = LoggerFactory.getLogger(Main.class);
-
-        Args options = new Args();
-        new JCommander(options, args);
-
-        log.info(options.toString());
-        //Loading in the config
-        SimConfig simConfig;
-        if (!isBlank(options.configFile))                   // if using config file
+        try
         {
-            simConfig = new SimConfig(options.configFile);
-        } else
-        {
-            simConfig = new SimConfig();
-        }
+            BufferedWriter w = new BufferedWriter(new FileWriter("results/extracted_neural.csv", true));
+            w.write("Generation,Average Neural,Max Neural");
+            w.newLine();
 
-        SensorMorphology morphology = null;
-        if(! options.evolvingMorphology)
-        {
-            morphology = new KheperaIIIMorphology();
-        }
+            ArrayList<Double> numLinksList = new ArrayList<>();
+//"/home/" + "afurman" + "lustre/" + args[1] + "/honours-project
+            File[] dirsInResults = new File("./results/").listFiles(File::isDirectory);
+            File[] currentResults = new File("./results/").listFiles(File::isDirectory);
+            //"/home/" + "afurman" + "/lustre/" + args[1] + "/honours-project/
+            System.out.println(currentResults[0].getName());
+            String pathPopulations = "./results/" + dirsInResults[0].getName() + "/populations/";
 
-        ScoreCalculator calculateScore =
-                new ScoreCalculator(simConfig, options.trialsPerIndividual, morphology, options.hyperNEATM);
+            File[] epochSersInPopulationsDir = new File(pathPopulations).listFiles(File::isFile);
 
+            int epoch=1;
 
-        String type = "";
-        if (!isBlank(options.genomePath))
-        {
-            NEATNetwork network = (NEATNetwork) readObjectFromFile(options.genomePath);
-            calculateScore.demo(network);
-            return;
-        }
-
-        final NEATPopulation population;
-        String popDirectory ="";
-        if (!isBlank(options.populationPath))
-        {
-            population = (NEATPopulation) readObjectFromFile(options.populationPath);
-            popDirectory = options.populationPath.split("results/")[1].split("/populations")[0];
-        }
-        else
-        {
-            if (options.hyperNEATM)
+            for (File epochX : epochSersInPopulationsDir)
             {
-                type = "HyperNEATM";
-                Substrate substrate;
-                if(options.evolvingMorphology){
-                    substrate = SubstrateFactory.createKheperaSubstrate(simConfig.getMinDistBetweenSensors(), SUBSTRATE_RADIUS);
-                }
-                else
+                org.encog.neural.neat.NEATPopulation pop = (NEATPopulation) Utils.readObjectFromFile(pathPopulations + "/epoch-" + epoch + ".ser");
+
+                for(Genome genome : pop.flatten())
                 {
-                    substrate = SubstrateFactory.createSubstrateFromSensorMorphology(morphology, SUBSTRATE_RADIUS);
-                }
-                population = new NEATMPopulation(substrate, options.populationSize, options.multiObjective, options.evolvingMorphology, morphology);
-            }
-            else
-            {
-                type = "NEATM";
-                population = new NEATMPopulation(2, options.populationSize, options.multiObjective, morphology);
-            }
-            population.setInitialConnectionDensity(options.connectionDensity);
-            population.reset();
-
-            log.debug("Population initialized");
-        }
-
-        EvolutionaryAlgorithm train;
-        if (options.hyperNEATM)
-        {
-            if (options.multiObjective)
-            {
-                type = "MO-" + type;
-                train = MultiObjectiveHyperNEATUtil.constructNEATTrainer(population, calculateScore, options.numGenerations);
-            }
-            else // single objective
-            {
-                if(options.evolvingMorphology){
-                    train = HyperNEATMUtil.constructNEATTrainer(population, calculateScore);
-                    ((SingleObjectiveEA) train).setCODEC(new HyperNEATMCODEC());
-                }
-                else{
-                    train = HyperNEATUtil.constructNEATTrainer(population, calculateScore);
-                    ((SingleObjectiveEA) train).setCODEC(new HyperNEATCODEC(morphology));
+                    int countLinks =0;
+                    for(NEATLinkGene link : ((NEATGenome)genome).getLinksChromosome())
+                    {
+                        if(link.isEnabled())
+                        {
+                            countLinks++;
+                        }
+                    }
+                    numLinksList.add((100-countLinks)/100.0);
                 }
 
-
-            }
-        }
-        else    // if NEATM
-        {
-            if (options.multiObjective)
-            {
-                type = "MO-" + type;
-                train = MultiObjectiveNEATMUtil.constructNEATTrainer(population, calculateScore, options.numGenerations);
-            }
-            else
-            {
-                if(options.evolvingMorphology){
-                    train = NEATMUtil.constructNEATTrainer(population, calculateScore);
-                }
-                else{
-                    train = NEATUtil.constructNEATTrainer(population, calculateScore);
-                }
-
-            }
-        }
-        //prevent elitist selection --> in future should use this for param tuning
-        if (!options.multiObjective)
-        {
-            ((SingleObjectiveEA) train).setEliteRate(0.2);
-        }
-        log.info("Available processors detected: " + Runtime.getRuntime().availableProcessors());
-        if (options.threads > 0)
-        {
-            if (!options.multiObjective)
-            {
-                ((SingleObjectiveEA) train).setThreadCount(options.threads);
-            }
-            else
-            {
-                ((MultiObjectiveEA) train).setThreadCount(options.threads);
-            }
-        }
-
-        final StatsRecorder statsRecorder;
-
-        if (options.multiObjective)
-        {
-
-            statsRecorder = new MOStatsRecorder(train, calculateScore, type, options.configFile,popDirectory);
-        }
-        else
-        {
-            statsRecorder = new StatsRecorder(train, calculateScore, type, options.configFile,popDirectory);
-        }
-
-        if(options.populationPath!=null){
-            if(options.multiObjective){
-                ((MultiObjectiveEA)train).firstIterationResume();
-            }
-            else{
-                ((SingleObjectiveEA)train).firstIterationResume();
-            }
-        }
-
-        for (int i = train.getIteration(); i < options.numGenerations; i++)
-        {
-            train.iteration();
-            statsRecorder.recordIterationStats();
-
-            /*
-            // set covergence for single objective
-            if(!options.multiObjective)
-            {
-                if (train.getBestGenome().getScore() >= CONVERGENCE_SCORE)
+                double avNumLinks = 0;
+                for (int i = 0; i < numLinksList.size(); i++)
                 {
-                    log.info("Convergence reached at epoch " + train.getIteration());
-                    break;
+                    avNumLinks += numLinksList.get(i);
                 }
+                avNumLinks = avNumLinks / numLinksList.size();
+                double maxNumLinks = Collections.max(numLinksList);
+
+                w.write(epoch+","+avNumLinks+","+maxNumLinks);
+                w.newLine();
+
+                System.out.println("av num links: " + avNumLinks);
+                System.out.println("max num links: " + maxNumLinks);
+
+                epoch++;
             }
-            */
+
+            w.close();
+
+
+
+
         }
-
-        log.debug("Training complete");
-        Encog.getInstance().shutdown();
-
-        // #alex - save best network and run demo on it
-        NEATNetwork bestPerformingNetwork = (NEATNetwork) train.getCODEC().decode(train.getBestGenome());   //extract best performing NN from the population
-        calculateScore.demo(bestPerformingNetwork);
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public static class Args
     {
         @Parameter(names = "-c", description = "Simulation config file to load")
-        //public static String configFile = "config/bossConfig.yml";
-        public static String configFile = "config/ConfigSimple.yml";
+        public static String configFile = "config/bossConfig.yml";
+        //public static String configFile = "config/ConfigSimple.yml";
         //public static String configFile = "config/ConfigMedium.yml";
         // public static String configFile = "config/ConfigDifficult.yml";
 
         @Parameter(names = "-g", description = "Number of generations to train for")    // Jamie calls this 'iterations'
-        public static int numGenerations = 250;
+        public static int numGenerations = 3;
 
         @Parameter(names = "-p", description = "Initial population size")
-        public static int populationSize = 150;
+        public static int populationSize = 3;
 
         @Parameter(names = "--trials", description = "Number of simulation runs per iteration (team lifetime)")
         // Jamie calls this 'simulationRuns' (and 'lifetime' in his paper)
-        public static int trialsPerIndividual = 3;
+        public static int trialsPerIndividual = 1;
 
         @Parameter(names = "--conn-density", description = "Adjust the initial connection density"
                 + " for the population")
