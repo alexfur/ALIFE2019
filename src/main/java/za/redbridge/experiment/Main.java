@@ -27,12 +27,11 @@ import za.redbridge.experiment.NEATM.sensor.SensorMorphology;
 import za.redbridge.experiment.SingleObjective.SingleObjectiveEA;
 import za.redbridge.simulator.config.SimConfig;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
@@ -58,18 +57,31 @@ public class Main
             w.newLine();
 
             ArrayList<Double> numLinksList = new ArrayList<>();
-//"/home/" + "afurman" + "lustre/" + args[1] + "/honours-project
-            File[] dirsInResults = new File("./results/").listFiles(File::isDirectory);
-            File[] currentResults = new File("./results/").listFiles(File::isDirectory);
-            //"/home/" + "afurman" + "/lustre/" + args[1] + "/honours-project/
-            System.out.println(currentResults[0].getName());
-            String pathPopulations = "./results/" + dirsInResults[0].getName() + "/populations/";
 
-            File[] epochSersInPopulationsDir = new File(pathPopulations).listFiles(File::isFile);
+
+            File file = new File("./results/");
+            String[] dirsInResults = file.list(new FilenameFilter() {
+                @Override
+                public boolean accept(File current, String name) {
+                    return new File(current, name).isDirectory();
+                }
+            });
+
+
+            String pathPopulations = "./results/" + dirsInResults[0] + "/populations/";
+
+
+            File file2 = new File(pathPopulations);
+            String[] epochSersInPopulationsDir = file2.list(new FilenameFilter() {
+                @Override
+                public boolean accept(File current, String name) {
+                    return new File(current, name).isFile();
+                }
+            });
 
             int epoch=1;
 
-            for (File epochX : epochSersInPopulationsDir)
+            for (String epochX : epochSersInPopulationsDir)
             {
                 org.encog.neural.neat.NEATPopulation pop = (NEATPopulation) Utils.readObjectFromFile(pathPopulations + "/epoch-" + epoch + ".ser");
 
